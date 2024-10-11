@@ -14,18 +14,33 @@ def validar_data(data):
     except ValueError:
         return False
 
+    # Implementar a lógica de validação do CPF
+def validar_cpf(cpf):
+    if len(cpf) != 11 or not cpf.isdigit():
+        return False
+    return True
+
 # Funções de operação bancária
 def depositar(saldo, extrato):
-    valor = float(input("Informe o valor do depósito: "))
-    if valor > 0:
-        saldo += valor
-        extrato += f"Depósito: R$ {valor:.2f}\n"
-        print("\n=== Depósito realizado com sucesso! ===")
-    else:
+    try:
+        valor = float(input("Informe o valor do depósito: "))
+        if valor > 0:
+            saldo += valor
+            extrato += f"Depósito: R$ {valor:.2f}\n"
+            print("\n=== Depósito realizado com sucesso! ===")
+        else:
+            print("Operação falhou! O valor informado é inválido.")
+    except ValueError:
         print("Operação falhou! O valor informado é inválido.")
     return saldo, extrato
 
 def sacar(*, saldo, valor, extrato, limite, numero_saques, limite_saques):
+    try:
+        valor = float(valor)
+    except ValueError:
+        print("Operação falhou! O valor informado é inválido.")
+        return saldo, extrato, numero_saques
+
     if valor > saldo:
         print("Operação falhou! Você não tem saldo suficiente.")
     elif valor > limite:
@@ -51,6 +66,10 @@ def exibir_extrato(saldo, /, *, extrato):
 def criar_usuario(usuarios):
     cpf = input("Informe o CPF (somente números): ")
     cpf = limpar_cpf(cpf)
+
+    if not validar_cpf(cpf):
+        print("CPF inválido! Por favor, insira um CPF válido.")
+        return None  # Retorna None se o CPF não for válido
 
     if any(usuario['cpf'] == cpf for usuario in usuarios):
         print("Já existe um usuário com esse CPF!")
@@ -120,7 +139,7 @@ def listar_contas(contas):
             print(f"CPF do Titular: {cpf_formatado}")
             print("=" * 50)
 
-# Função principal com o menu atualizado
+# Função principal  menu 
 def main():
     saldo = 0
     limite = 500
@@ -149,7 +168,7 @@ def main():
             saldo, extrato = depositar(saldo, extrato)
 
         elif opcao == "s":
-            valor = float(input("Informe o valor do saque: "))
+            valor = input("Informe o valor do saque: ")
             saldo, extrato, numero_saques = sacar(
                 saldo=saldo, valor=valor, extrato=extrato, 
                 limite=limite, numero_saques=numero_saques, 
